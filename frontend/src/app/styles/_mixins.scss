@@ -1,0 +1,49 @@
+@use "variables" as *;
+
+//buttons
+@mixin button($bg, $color) {
+  padding: 12px 8px;
+  background-color: $bg;
+  border-radius: $border-radius-btn;
+  color: $color;
+  height: fit-content;
+  border: none;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+
+  &.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// lists
+@mixin card-colors($bg) {
+  h2 {color: $light}
+  background-color: $bg;
+  border: $border-transparent;
+  color: $description-color;
+}
+
+@mixin group-tag-colors($color) {
+  border: 1px solid $color;
+  color: $color;
+}
+
+@mixin form-field() {
+  border: $border;
+  color:  $light;
+  background-color: $dark;
+  padding-top: 8px;
+  font-size: 12px;
+  padding-bottom: 8px;
+  border-radius: $border-radius-input;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  &:focus {
+    border: $selected-border;
+    outline: none;
+  }
+}

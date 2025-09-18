@@ -1,0 +1,109 @@
+<div class="body-container">
+  @let sort = (categoriesStore.sort$|async);
+  @let loading = (categoriesStore.loading$|async);
+  @let error = (categoriesStore.error$|async);
+  @let filteredCategories = (categoriesStore.filteredCategories$|async);
+  @let groupedCategories = (categoriesStore.categoriesByGroup$|async);
+  @let groups = (this.categoriesStore.groups$|async);
+  @let search = (this.categoriesStore.search$|async);
+  @let selectedGroupId = (this.categoriesStore.selectedGroupId$|async);
+  @let selectedCategory = (this.categoriesStore.selectedCategory$|async);
+
+  <app-header>
+    <span header-title>Catégorie</span>
+    <app-sort-buttons
+      header-content
+      [ngModel]="sort"
+      (ngModelChange)="categoriesStore.setSort($event)"
+      [options]="sortOptions">
+    </app-sort-buttons>
+  </app-header>
+
+  <div class="table-container" [style.border-bottom-width]="sort === 'alphabet' ? '0' : '1px'">
+    <!-- Filters & Search -->
+    <div class="large-row filter-container"
+         [style.border-bottom-width]="(sort === 'alphabet') ? '1px' : '0'">
+      <app-input [ngModel]="search" (ngModelChange)="categoriesStore.setSearch($event)"/>
+      <app-select
+        [options]="groups"
+        [ngModel]="selectedGroupId"
+        [labelKey]="'name'"
+        [valueKey]="'id'"
+        [defaultOption]="{value: null, label: 'Tous les groupes de catégories'}"
+        (ngModelChange)="categoriesStore.setGroup($event)">
+      </app-select>
+    </div>
+
+    <div class="table">
+      @if (loading) {
+        <!-- LOADING -->
+        <div class="large-row no-data loading">
+          <app-loading></app-loading>
+        </div>
+      } @else if (error) {
+        <!-- ERROR -->
+        <div class="large-row  no-data error">
+          <p>Un problème est survenu : {{error}}</p>
+          <button class="primary-button-outline" (click)="categoriesStore.init()">Réessayer</button>
+        </div>
+      } @else if (filteredCategories?.length > 0) {
+        @if (sort === 'alphabet') {
+          <!-- Alphabetical Order -->
+          @for (row of (filteredCategories | sliceToRows:listColumnNumber); track $index) {
+            <ng-container *ngTemplateOutlet="tableItem; context: {row, showTag: true}"></ng-container>
+          }
+        } @else {
+          <!-- Group Order -->
+          @for (categoriesByGroup of groupedCategories; track categoriesByGroup.group.id) {
+            <div class="list-group">
+              <div class="group-title"
+                   [ngClass]="categoriesByGroup.group.color ? categoriesByGroup.group.color : 'm-no-color'">
+                {{ categoriesByGroup.group.name }}
+              </div>
+              <div class="table-row">
+                @for (row of (categoriesByGroup.categories | sliceToRows:listColumnNumber); track $index) {
+                  <ng-container *ngTemplateOutlet="tableItem; context: {row, showTag: false}"></ng-container>
+                }
+              </div>
+            </div>
+          }
+        }
+      } @else {
+        <!-- NO DATA :( -->
+        <div class="large-row no-data" [style.border-top-width]="(sort === 'alphabet') ? '0' : '1px'">
+          <p>Aucune catégorie ne correspond à la recherche.</p>
+          <button class="primary-button-outline" (click)="categoriesStore.clearFilters()">Effacer les filtres</button>
+        </div>
+      }
+    </div>
+  </div>
+
+  <app-footer>
+    <div footer-content>
+      <button class="primary-button"
+              [class.disabled]="!selectedCategory"
+              (click)="displayCategory(selectedCategory)"
+              [disabled]="!selectedCategory">
+        Sélectionner la catégorie
+      </button>
+    </div>
+  </app-footer>
+</div>
+
+<!-- COLUMN ITEM TEMPLATE -->
+<ng-template #tableItem let-row="row" let-showTag="showTag">
+  <div class="table-cell" [style.grid-template-columns]="'repeat(' + listColumnNumber + ', 1fr)'">
+    @for (category of row; track category.id) {
+      <app-category-card
+        class="cell"
+        [category]="category"
+        [isCategorySelected]="selectedCategory?.id === category.id"
+        [showTag]="showTag"
+        (selection)="getSelectedCategory($event)">
+      </app-category-card>
+    }
+    @for (empty of (row.length | emptyColumns:listColumnNumber); track $index) {
+      <div class="cell empty-cell"></div>
+    }
+  </div>
+</ng-template>

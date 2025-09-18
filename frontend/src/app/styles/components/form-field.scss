@@ -1,0 +1,90 @@
+@use "../variables" as *;
+@use "../mixins" as *;
+
+input[type=text] {
+  @include form-field();
+}
+
+//input (search-bar)
+input[type=text].search-bar {
+  box-sizing: border-box;
+  background-image: url('../../../../public/icons/search-icon.svg');
+  background-position: 10px center;
+  background-repeat: no-repeat;
+  padding: 8px 40px;
+  width: 100%;
+  @include form-field();
+
+  &::placeholder {
+    color: $light;
+  }
+}
+
+.input-container {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+app-input {
+  width: 100%;
+}
+
+.input {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 14px;
+}
+
+.clear-button {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 50%;
+
+  color: $primary;
+
+  padding: 4px;
+  width: 24px;
+  height: 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+
+  z-index: 1;
+
+  &:hover {
+    background-color: $light;
+  }
+
+  &:active {
+    background-color: $medium;
+  }
+}
+
+
+//select
+select {
+  appearance: none;
+  background: $white url('/icons/arrow-icon.svg') no-repeat right 0.75rem center;
+  padding: 8px 32px 8px 8px;
+  @include form-field();
+}
+
+@media (max-width: 576px) {
+  select {
+    width: 100%;
+    max-width: 100%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+}
